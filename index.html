@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RFP Section Builder</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    textarea { resize: vertical; }
+    #preview-content h2 { font-size: 1.15rem; font-weight: 700; border-bottom: 2px solid #334155; padding-bottom: 0.4rem; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #e2e8f0; }
+    #preview-content p, #preview-content .section-body { white-space: pre-wrap; color: #cbd5e1; font-size: 0.875rem; line-height: 1.7; }
+    #preview-content .meta-line { color: #64748b; font-size: 0.75rem; }
+    #preview-content .rfp-header { border-bottom: 3px solid #6366f1; padding-bottom: 1rem; margin-bottom: 1.5rem; }
+    .tab-btn.active { background: #6366f1; color: white; }
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white; color: black; }
+      #preview-panel { background: white; color: black; border: none; }
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-10 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-indigo-600 rounded-xl flex items-center justify-center" aria-hidden="true">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-lg font-bold text-white">RFP Builder</h1>
+          <p class="text-xs text-slate-500">Request for Proposal Template</p>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="clearAll()" class="px-3 py-2 text-sm bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500" aria-label="Clear all fields">
+          Clear
+        </button>
+        <button onclick="showPreview()" id="preview-btn" class="px-3 py-2 text-sm bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-label="Preview RFP document">
+          Preview
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Tab Bar -->
+  <div class="bg-slate-900 border-b border-slate-800 no-print" role="tablist" aria-label="RFP builder sections">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex gap-1 py-2 overflow-x-auto">
+        <button onclick="showTab('form')" id="tab-form" class="tab-btn active px-4 py-1.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-indigo-400" role="tab" aria-selected="true" aria-controls="form-panel">
+          Edit
+        </button>
+        <button onclick="showTab('preview')" id="tab-preview" class="tab-btn px-4 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white transition-colors whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-indigo-400" role="tab" aria-selected="false" aria-controls="preview-panel">
+          Preview
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 py-6">
+
+    <!-- FORM PANEL -->
+    <div id="form-panel" role="tabpanel" aria-labelledby="tab-form">
+      <!-- Project Info -->
+      <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-5">
+        <h2 class="text-base font-bold text-white mb-4 flex items-center gap-2">
+          <span class="w-6 h-6 bg-indigo-600 rounded text-xs font-bold flex items-center justify-center text-white" aria-hidden="true">i</span>
+          Project Information
+        </h2>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="project-name" class="block text-xs font-medium text-slate-400 mb-1">Project Name *</label>
+            <input type="text" id="project-name" placeholder="e.g. Website Redesign 2025" oninput="autosave()"
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              aria-required="true" aria-label="Project name" />
+          </div>
+          <div>
+            <label for="org-name" class="block text-xs font-medium text-slate-400 mb-1">Issuing Organization *</label>
+            <input type="text" id="org-name" placeholder="e.g. Acme Corporation" oninput="autosave()"
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              aria-required="true" aria-label="Organization name" />
+          </div>
+          <div>
+            <label for="issue-date" class="block text-xs font-medium text-slate-400 mb-1">Issue Date</label>
+            <input type="date" id="issue-date" oninput="autosave()"
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              aria-label="Issue date" />
+          </div>
+          <div>
+            <label for="due-date" class="block text-xs font-medium text-slate-400 mb-1">Proposal Due Date</label>
+            <input type="date" id="due-date" oninput="autosave()"
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              aria-label="Proposal due date" />
+          </div>
+          <div>
+            <label for="contact-name" class="block text-xs font-medium text-slate-400 mb-1">Contact Name</label>
+            <input type="text" id="contact-name" placeholder="e.g. Jane Smith" oninput="autosave()"
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500"
+              aria-label="Contact name" />
+          </div>
+          <div>
+            <label for="contact-email" class="block text-xs font-medium text-slate-400 mb-1">Contact Email</label>
+            <input type="email" id="contact-email" placeholder="rfp@company.com" oninput="autosave()"
+              class="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500"
+              aria-label="Contact email" />
+          </div>
+        </div>
+      </section>
+
+      <!-- Sections -->
+      <div id="sections-container" class="space-y-4 mb-5"></div>
+
+      <!-- Action Bar -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-wrap gap-3 items-center">
+        <span class="text-sm text-slate-400">Preview &amp; Export:</span>
+        <button onclick="showPreview()" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-4 py-2 rounded-xl text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-400" aria-label="Preview RFP">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          Preview
+        </button>
+        <button onclick="copyToClipboard()" class="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-xl text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500" aria-label="Copy RFP text to clipboard">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          Copy Text
+        </button>
+        <button onclick="downloadTxt()" class="flex items-center gap-2 bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-xl text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500" aria-label="Download RFP as text file">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+          Download .txt
+        </button>
+        <div id="copy-toast" class="hidden text-emerald-400 text-sm font-medium" role="alert" aria-live="polite">Copied!</div>
+      </div>
+    </div>
+
+    <!-- PREVIEW PANEL -->
+    <div id="preview-panel" class="hidden bg-slate-900 border border-slate-700 rounded-2xl p-8 shadow-xl" role="tabpanel" aria-labelledby="tab-preview">
+      <div id="preview-content" class="max-w-3xl mx-auto"></div>
+    </div>
+
+  </div>
+
+  <script>
+    function escapeHtml(s) {
+      const d = document.createElement('div');
+      d.appendChild(document.createTextNode(String(s ?? '')));
+      return d.innerHTML;
+    }
+
+    const STORAGE_KEY = 'rfp-builder-v1';
+
+    const SECTIONS = [
+      { key: 'overview', label: 'Project Overview', placeholder: 'Describe the background and context of this project. What problem are you solving? What is the purpose of this RFP?' },
+      { key: 'scope', label: 'Scope of Work', placeholder: 'Detail the work required. List all major deliverables, tasks, and activities the vendor is expected to perform.' },
+      { key: 'deliverables', label: 'Deliverables', placeholder: 'List all specific deliverables expected from the vendor. Include formats, quantities, and acceptance criteria.' },
+      { key: 'timeline', label: 'Timeline & Milestones', placeholder: 'Specify the project timeline. Include key milestones, deadlines, and the expected project completion date.' },
+      { key: 'evaluation', label: 'Evaluation Criteria', placeholder: 'Describe how proposals will be evaluated. Include weighting if applicable (e.g., Technical Approach 30%, Cost 40%, Experience 30%).' },
+      { key: 'budget', label: 'Budget Range', placeholder: 'State the available budget or acceptable budget range. Indicate whether the budget is fixed or flexible.' },
+      { key: 'submission', label: 'Submission Instructions', placeholder: 'Describe how and where to submit proposals. Include format requirements, page limits, required sections, and submission deadline.' },
+    ];
+
+    function buildForm() {
+      const saved = loadData();
+      document.getElementById('sections-container').innerHTML = SECTIONS.map(s => `
+        <section class="bg-slate-900 border border-slate-800 rounded-2xl p-6">
+          <label for="s-${s.key}" class="block font-semibold text-white mb-2 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-indigo-500" aria-hidden="true"></span>
+            ${escapeHtml(s.label)}
+          </label>
+          <textarea id="s-${s.key}" rows="5" placeholder="${escapeHtml(s.placeholder)}" oninput="autosave()"
+            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-200 text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 placeholder-slate-600 min-h-[100px]"
+            aria-label="${escapeHtml(s.label)} section content">${escapeHtml(saved[s.key] || '')}</textarea>
+        </section>
+      `).join('');
+    }
+
+    function loadData() {
+      try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; }
+    }
+
+    function collectData() {
+      const data = {
+        projectName: document.getElementById('project-name').value,
+        orgName: document.getElementById('org-name').value,
+        issueDate: document.getElementById('issue-date').value,
+        dueDate: document.getElementById('due-date').value,
+        contactName: document.getElementById('contact-name').value,
+        contactEmail: document.getElementById('contact-email').value,
+      };
+      SECTIONS.forEach(s => { data[s.key] = document.getElementById('s-' + s.key).value; });
+      return data;
+    }
+
+    function autosave() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(collectData()));
+    }
+
+    function loadSaved() {
+      const d = loadData();
+      if (d.projectName) document.getElementById('project-name').value = d.projectName;
+      if (d.orgName) document.getElementById('org-name').value = d.orgName;
+      if (d.issueDate) document.getElementById('issue-date').value = d.issueDate;
+      if (d.dueDate) document.getElementById('due-date').value = d.dueDate;
+      if (d.contactName) document.getElementById('contact-name').value = d.contactName;
+      if (d.contactEmail) document.getElementById('contact-email').value = d.contactEmail;
+    }
+
+    function buildTextOutput() {
+      const d = collectData();
+      const lines = [];
+      lines.push('REQUEST FOR PROPOSAL (RFP)');
+      lines.push('='.repeat(60));
+      if (d.projectName) lines.push(`Project: ${d.projectName}`);
+      if (d.orgName) lines.push(`Organization: ${d.orgName}`);
+      if (d.issueDate) lines.push(`Issue Date: ${d.issueDate}`);
+      if (d.dueDate) lines.push(`Proposal Due: ${d.dueDate}`);
+      if (d.contactName || d.contactEmail) lines.push(`Contact: ${[d.contactName, d.contactEmail].filter(Boolean).join(' | ')}`);
+      lines.push('');
+      SECTIONS.forEach(s => {
+        const val = d[s.key];
+        if (val && val.trim()) {
+          lines.push(s.label.toUpperCase());
+          lines.push('-'.repeat(40));
+          lines.push(val.trim());
+          lines.push('');
+        }
+      });
+      return lines.join('\n');
+    }
+
+    function generateHtmlPreview() {
+      const d = collectData();
+      let html = `<div class="rfp-header">
+        <div class="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-2">Request for Proposal</div>
+        <h1 class="text-2xl font-bold text-white mb-1">${escapeHtml(d.projectName || 'Untitled RFP')}</h1>
+        <div class="flex flex-wrap gap-4 mt-3">
+          ${d.orgName ? `<span class="meta-line">Organization: <strong>${escapeHtml(d.orgName)}</strong></span>` : ''}
+          ${d.issueDate ? `<span class="meta-line">Issued: <strong>${escapeHtml(d.issueDate)}</strong></span>` : ''}
+          ${d.dueDate ? `<span class="meta-line">Due: <strong>${escapeHtml(d.dueDate)}</strong></span>` : ''}
+          ${d.contactName ? `<span class="meta-line">Contact: <strong>${escapeHtml(d.contactName)}</strong></span>` : ''}
+          ${d.contactEmail ? `<span class="meta-line"><a href="mailto:${escapeHtml(d.contactEmail)}" class="text-indigo-400">${escapeHtml(d.contactEmail)}</a></span>` : ''}
+        </div>
+      </div>`;
+      let hasSections = false;
+      SECTIONS.forEach(s => {
+        const val = d[s.key];
+        if (val && val.trim()) {
+          hasSections = true;
+          html += `<h2>${escapeHtml(s.label)}</h2><div class="section-body">${escapeHtml(val.trim())}</div>`;
+        }
+      });
+      if (!hasSections) {
+        html += `<p class="text-slate-500 text-sm mt-4 italic">No section content yet. Fill in the form to build your RFP.</p>`;
+      }
+      return html;
+    }
+
+    function showTab(tab) {
+      const isForm = tab === 'form';
+      document.getElementById('form-panel').classList.toggle('hidden', !isForm);
+      document.getElementById('preview-panel').classList.toggle('hidden', isForm);
+      document.getElementById('tab-form').classList.toggle('active', isForm);
+      document.getElementById('tab-preview').classList.toggle('active', !isForm);
+      document.getElementById('tab-form').setAttribute('aria-selected', isForm);
+      document.getElementById('tab-preview').setAttribute('aria-selected', !isForm);
+      if (!isForm) { document.getElementById('preview-content').innerHTML = generateHtmlPreview(); }
+    }
+
+    function showPreview() { showTab('preview'); }
+
+    async function copyToClipboard() {
+      const text = buildTextOutput();
+      try {
+        await navigator.clipboard.writeText(text);
+        const t = document.getElementById('copy-toast');
+        t.classList.remove('hidden');
+        setTimeout(() => t.classList.add('hidden'), 2000);
+      } catch(e) {
+        alert('Copy failed. Please use Ctrl+C on the preview text.');
+      }
+    }
+
+    function downloadTxt() {
+      const text = buildTextOutput();
+      const d = collectData();
+      const filename = (d.projectName || 'rfp').replace(/[^a-z0-9]/gi, '-').toLowerCase() + '.txt';
+      const blob = new Blob([text], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = filename; a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function clearAll() {
+      if (!confirm('Clear all RFP data? This cannot be undone.')) return;
+      localStorage.removeItem(STORAGE_KEY);
+      document.getElementById('project-name').value = '';
+      document.getElementById('org-name').value = '';
+      document.getElementById('issue-date').value = '';
+      document.getElementById('due-date').value = '';
+      document.getElementById('contact-name').value = '';
+      document.getElementById('contact-email').value = '';
+      SECTIONS.forEach(s => { const el = document.getElementById('s-' + s.key); if (el) el.value = ''; });
+    }
+
+    buildForm();
+    loadSaved();
+  </script>
+</body>
+</html>
